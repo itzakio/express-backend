@@ -7,7 +7,7 @@ import { ObjectId } from 'mongodb';
 // Register
 export async function register(req: Request, res: Response) {
   try {
-    const { username, email, password, role = 'user' } = req.body;
+    const { username, email,image, password, role = 'user' } = req.body;
 
     // Check existing user
     const existing = await findUserByEmail(email);
@@ -22,6 +22,7 @@ export async function register(req: Request, res: Response) {
     const newUser = await createUser({
       username,
       email,
+      image,
       password: hashedPassword,
       role: role === 'admin' ? 'admin' : 'user',  // only allow admin via special logic
     });
