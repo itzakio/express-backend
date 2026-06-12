@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Authentication API</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 50px auto;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .container {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        color: #333;
+      }
+      .endpoint {
+        background: #e8f4f8;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 5px;
+        font-family: monospace;
+      }
+      .method {
+        color: #28a745;
+        font-weight: bold;
+      }
+      .url {
+        color: #007bff;
+      }
+      button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      button:hover {
+        background: #0056b3;
+      }
+      pre {
+        background: #f4f4f4;
+        padding: 10px;
+        border-radius: 5px;
+        overflow-x: auto;
+      }
+      input,
+      textarea {
+        width: 100%;
+        padding: 8px;
+        margin: 5px 0;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🔐 Authentication API</h1>
+      <p>Welcome to the authentication system. Use the endpoints below:</p>
+
+      <h2>📡 Available Endpoints</h2>
+      <div class="endpoint">
+        <span class="method">POST</span>
+        <span class="url">/api/auth/register</span> - Register new user
+      </div>
+      <div class="endpoint">
+        <span class="method">POST</span>
+        <span class="url">/api/auth/login</span> - Login user
+      </div>
+      <div class="endpoint">
+        <span class="method">POST</span>
+        <span class="url">/api/auth/refresh</span> - Refresh access token
+      </div>
+      <div class="endpoint">
+        <span class="method">POST</span>
+        <span class="url">/api/auth/logout</span> - Logout user
+      </div>
+      <div class="endpoint">
+        <span class="method">GET</span>
+        <span class="url">/api/auth/profile</span> - Get user profile (Auth
+        required)
+      </div>
+      <div class="endpoint">
+        <span class="method">GET</span>
+        <span class="url">/api/auth/admin</span> - Admin only (Auth required)
+      </div>
+
+      <h2>🧪 Test Authentication</h2>
+      <h3>Register</h3>
+      <input type="text" id="regUsername" placeholder="Username" />
+      <input type="email" id="regEmail" placeholder="Email" />
+      <input type="password" id="regPassword" placeholder="Password" />
+      <button onclick="register()">Register</button>
+
+      <h3>Login</h3>
+      <input type="email" id="loginEmail" placeholder="Email" />
+      <input type="password" id="loginPassword" placeholder="Password" />
+      <button onclick="login()">Login</button>
+
+      <h3>Response</h3>
+      <pre id="response">Response will appear here...</pre>
+    </div>
+
+    <script>
+      let accessToken = null;
+
+      async function register() {
+        const data = {
+          username: document.getElementById("regUsername").value,
+          email: document.getElementById("regEmail").value,
+          password: document.getElementById("regPassword").value,
+        };
+
+        const response = await fetch("/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+        const result = await response.json();
+        document.getElementById("response").textContent = JSON.stringify(
+          result,
+          null,
+          2,
+        );
+        if (result.accessToken) accessToken = result.accessToken;
+      }
+
+      async function login() {
+        const data = {
+          email: document.getElementById("loginEmail").value,
+          password: document.getElementById("loginPassword").value,
+        };
+
+        const response = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(data),
+        });
+        const result = await response.json();
+        document.getElementById("response").textContent = JSON.stringify(
+          result,
+          null,
+          2,
+        );
+        if (result.accessToken) accessToken = result.accessToken;
+      }
+    </script>
+  </body>
+</html>
