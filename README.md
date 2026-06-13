@@ -8,3 +8,7 @@ ACCESS_TOKEN_SECRET=your_access_secret_key
 REFRESH_TOKEN_SECRET=your_refresh_secret_key
 ACCESS_TOKEN_EXPIRY=15m
 REFRESH_TOKEN_EXPIRY=7d
+
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASS=your_app_password_here
+

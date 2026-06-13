@@ -1,160 +1,557 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Authentication API</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        max-width: 800px;
-        margin: 50px auto;
-        padding: 20px;
-        background: #f5f5f5;
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Authentication API Tester</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #f0f2f5;
+    }
+    .main-container {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .endpoints-panel {
+      flex: 2;
+      min-width: 300px;
+    }
+    .response-panel {
+      flex: 1;
+      min-width: 300px;
+      position: sticky;
+      top: 20px;
+      align-self: flex-start;
+    }
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    h1, h2 {
+      color: #1a1a2e;
+      margin-top: 0;
+    }
+    .endpoint-card {
+      background: #f9f9fc;
+      border-left: 4px solid #007bff;
+      padding: 16px;
+      margin-bottom: 16px;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      transition: all 0.2s;
+    }
+    .endpoint-card:hover {
+      background: #fff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .endpoint-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .method-url {
+      font-family: 'Courier New', monospace;
+      font-size: 1.1rem;
+    }
+    .method {
+      color: #28a745;
+      font-weight: bold;
+      background: #e9f7ef;
+      padding: 4px 8px;
+      border-radius: 4px;
+      margin-right: 8px;
+    }
+    .url {
+      color: #007bff;
+      word-break: break-all;
+    }
+    .button-group {
+      display: flex;
+      gap: 8px;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: 0.2s;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    button.copy-btn {
+      background: #6c757d;
+    }
+    button.copy-btn:hover {
+      background: #5a6268;
+    }
+    button.try-btn {
+      background: #17a2b8;
+    }
+    button.try-btn:hover {
+      background: #138496;
+    }
+    .input-fields {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px dashed #ddd;
+      display: none;
+    }
+    .input-fields.show {
+      display: block;
+    }
+    .input-group {
+      margin-bottom: 12px;
+      position: relative;
+    }
+    .input-group label {
+      display: block;
+      font-weight: 600;
+      font-size: 0.85rem;
+      margin-bottom: 4px;
+      color: #495057;
+    }
+    .password-wrapper {
+      display: flex;
+      align-items: center;
+      position: relative;
+    }
+    .password-wrapper input {
+      flex: 1;
+      padding-right: 40px;
+    }
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.2rem;
+      padding: 0;
+      color: #6c757d;
+      background-color: transparent;
+      box-shadow: none;
+      width: auto;
+    }
+    .toggle-password:hover {
+      background: none;
+      color: #007bff;
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #ced4da;
+      border-radius: 6px;
+      font-family: monospace;
+    }
+    .send-btn {
+      background: #28a745;
+      margin-top: 8px;
+    }
+    .send-btn:hover {
+      background: #218838;
+    }
+    pre {
+      background: #1e1e2f;
+      color: #f8f9fa;
+      padding: 16px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 0.85rem;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      max-height: 500px;
+    }
+    .response-title {
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    .badge {
+      background: #e9ecef;
+      padding: 2px 6px;
+      border-radius: 12px;
+      font-size: 0.7rem;
+      color: #495057;
+      margin-left: 8px;
+    }
+    hr {
+      margin: 16px 0;
+    }
+    @media (max-width: 800px) {
+      .main-container {
+        flex-direction: column;
       }
-      .container {
-        background: white;
-        padding: 30px;
-        border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      .response-panel {
+        position: static;
       }
-      h1 {
-        color: #333;
-      }
-      .endpoint {
-        background: #e8f4f8;
-        padding: 10px;
-        margin: 10px 0;
-        border-radius: 5px;
-        font-family: monospace;
-      }
-      .method {
-        color: #28a745;
-        font-weight: bold;
-      }
-      .url {
-        color: #007bff;
-      }
-      button {
-        background: #007bff;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 5px;
-        cursor: pointer;
-        margin: 5px;
-      }
-      button:hover {
-        background: #0056b3;
-      }
-      pre {
-        background: #f4f4f4;
-        padding: 10px;
-        border-radius: 5px;
-        overflow-x: auto;
-      }
-      input,
-      textarea {
-        width: 100%;
-        padding: 8px;
-        margin: 5px 0;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-      }
-    </style>
-  </head>
-  <body>
+    }
+  </style>
+</head>
+<body>
+<div class="main-container">
+  <div class="endpoints-panel">
     <div class="container">
-      <h1>🔐 Authentication API</h1>
-      <p>Welcome to the authentication system. Use the endpoints below:</p>
-
-      <h2>📡 Available Endpoints</h2>
-      <div class="endpoint">
-        <span class="method">POST</span>
-        <span class="url">/api/auth/register</span> - Register new user
-      </div>
-      <div class="endpoint">
-        <span class="method">POST</span>
-        <span class="url">/api/auth/login</span> - Login user
-      </div>
-      <div class="endpoint">
-        <span class="method">POST</span>
-        <span class="url">/api/auth/refresh</span> - Refresh access token
-      </div>
-      <div class="endpoint">
-        <span class="method">POST</span>
-        <span class="url">/api/auth/logout</span> - Logout user
-      </div>
-      <div class="endpoint">
-        <span class="method">GET</span>
-        <span class="url">/api/auth/profile</span> - Get user profile (Auth
-        required)
-      </div>
-      <div class="endpoint">
-        <span class="method">GET</span>
-        <span class="url">/api/auth/admin</span> - Admin only (Auth required)
-      </div>
-
-      <h2>🧪 Test Authentication</h2>
-      <h3>Register</h3>
-      <input type="text" id="regUsername" placeholder="Username" />
-      <input type="email" id="regEmail" placeholder="Email" />
-      <input type="password" id="regPassword" placeholder="Password" />
-      <button onclick="register()">Register</button>
-
-      <h3>Login</h3>
-      <input type="email" id="loginEmail" placeholder="Email" />
-      <input type="password" id="loginPassword" placeholder="Password" />
-      <button onclick="login()">Login</button>
-
-      <h3>Response</h3>
-      <pre id="response">Response will appear here...</pre>
+      <h1>🔐 Auth API Playground</h1>
+      <p>Click <strong>Try</strong> to test an endpoint, <strong>Copy</strong> to copy the URL.</p>
     </div>
+    <div id="endpointsContainer" class="container"></div>
+  </div>
+  <div class="response-panel">
+    <div class="container">
+      <div class="response-title">📋 Response</div>
+      <pre id="response">Response will appear here...</pre>
+      <div style="margin-top: 16px;">
+        <button id="clearResponse" style="background:#dc3545;">Clear Response</button>
+      </div>
+      <hr>
+      <div class="response-title">🔑 Current Access Token</div>
+      <pre id="tokenDisplay" style="background:#f8f9fa; color:#212529;">No token yet</pre>
+      <button id="clearToken" style="background:#ffc107; color:#212529;">Clear Token</button>
+    </div>
+  </div>
+</div>
 
-    <script>
-      let accessToken = null;
+<script>
+  // API definition list
+  const endpoints = [
+    { method: "POST", url: "/api/auth/register", fields: ["username", "email", "password"], needsAuth: false, description: "Register new user" },
+    { method: "POST", url: "/api/auth/login", fields: ["email", "password"], needsAuth: false, description: "Login user" },
+    { method: "POST", url: "/api/auth/refresh", fields: [], needsAuth: false, description: "Refresh access token (uses cookie)" },
+    { method: "POST", url: "/api/auth/logout", fields: [], needsAuth: true, description: "Logout (clears cookie)" },
+    { method: "GET", url: "/api/auth/profile", fields: [], needsAuth: true, description: "Get user profile" },
+    { method: "GET", url: "/api/auth/admin", fields: [], needsAuth: true, description: "Admin only" },
+    { method: "POST", url: "/api/auth/forgot-password", fields: ["email"], needsAuth: false, description: "Request password reset OTP" },
+    { method: "POST", url: "/api/auth/verify-otp", fields: ["email", "otp"], needsAuth: false, description: "Verify OTP and get reset token" },
+    { method: "POST", url: "/api/auth/reset-password", fields: ["email", "resetToken", "newPassword"], needsAuth: false, description: "Reset password using token" }
+  ];
 
-      async function register() {
-        const data = {
-          username: document.getElementById("regUsername").value,
-          email: document.getElementById("regEmail").value,
-          password: document.getElementById("regPassword").value,
-        };
+  let accessToken = localStorage.getItem("accessToken") || null;
+  updateTokenDisplay();
 
-        const response = await fetch("/api/auth/register", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
-        });
-        const result = await response.json();
-        document.getElementById("response").textContent = JSON.stringify(
-          result,
-          null,
-          2,
-        );
-        if (result.accessToken) accessToken = result.accessToken;
+  function updateTokenDisplay() {
+    const tokenDisplay = document.getElementById("tokenDisplay");
+    if (accessToken) {
+      tokenDisplay.textContent = accessToken.substring(0, 50) + (accessToken.length > 50 ? "..." : "");
+    } else {
+      tokenDisplay.textContent = "No token (login or register to get one)";
+    }
+  }
+
+  function setAccessToken(token) {
+    accessToken = token;
+    if (token) localStorage.setItem("accessToken", token);
+    else localStorage.removeItem("accessToken");
+    updateTokenDisplay();
+  }
+
+  document.getElementById("clearToken").addEventListener("click", () => {
+    setAccessToken(null);
+    appendResponse("Token cleared manually.");
+  });
+  document.getElementById("clearResponse").addEventListener("click", () => {
+    document.getElementById("response").textContent = "Response cleared.";
+  });
+
+  function appendResponse(text) {
+    const pre = document.getElementById("response");
+    pre.textContent = typeof text === "object" ? JSON.stringify(text, null, 2) : text;
+  }
+
+  // Helper to create a password field with toggle button
+  function createPasswordInput(parent, fieldName, urlPath) {
+    const group = document.createElement("div");
+    group.className = "input-group";
+    const label = document.createElement("label");
+    label.textContent = fieldName;
+    group.appendChild(label);
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "password-wrapper";
+    const input = document.createElement("input");
+    input.type = "password";
+    input.id = `${fieldName}-${urlPath}`;
+    input.placeholder = fieldName;
+    const toggle = document.createElement("button");
+    toggle.textContent = "👁️";
+    toggle.className = "toggle-password";
+    toggle.type = "button";
+    toggle.title = "Show/Hide password";
+    toggle.addEventListener("click", () => {
+      const isPassword = input.type === "password";
+      input.type = isPassword ? "text" : "password";
+      toggle.textContent = isPassword ? "🙈" : "👁️";
+    });
+    wrapper.appendChild(input);
+    wrapper.appendChild(toggle);
+    group.appendChild(wrapper);
+    parent.appendChild(group);
+  }
+
+  // Build UI
+  const container = document.getElementById("endpointsContainer");
+  endpoints.forEach(ep => {
+    const card = document.createElement("div");
+    card.className = "endpoint-card";
+
+    const header = document.createElement("div");
+    header.className = "endpoint-header";
+    header.innerHTML = `
+      <div class="method-url">
+        <span class="method">${ep.method}</span>
+        <span class="url">${ep.url}</span>
+        ${ep.needsAuth ? '<span class="badge">🔐 Auth required</span>' : ''}
+      </div>
+      <div class="button-group">
+        <button class="try-btn" data-url="${ep.url}" data-method="${ep.method}">🚀 Try</button>
+        <button class="copy-btn" data-url="${ep.url}">📋 Copy</button>
+      </div>
+    `;
+    card.appendChild(header);
+
+    const inputDiv = document.createElement("div");
+    inputDiv.className = "input-fields";
+    inputDiv.id = `inputs-${ep.url.replace(/\//g, '-')}`;
+    card.appendChild(inputDiv);
+    container.appendChild(card);
+
+    ep.inputDiv = inputDiv;
+    ep.card = card;
+  });
+
+  // Copy functionality
+  document.querySelectorAll(".copy-btn").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      const url = btn.getAttribute("data-url");
+      navigator.clipboard.writeText(url);
+      const originalText = btn.textContent;
+      btn.textContent = "Copied!";
+      setTimeout(() => btn.textContent = originalText, 1000);
+      appendResponse(`Copied URL: ${url}`);
+    });
+  });
+
+  // Try button: show/hide input fields, create dynamic form
+  document.querySelectorAll(".try-btn").forEach(btn => {
+    btn.addEventListener("click", async (e) => {
+      const url = btn.getAttribute("data-url");
+      const method = btn.getAttribute("data-method");
+      const endpoint = endpoints.find(ep => ep.url === url);
+      if (!endpoint) return;
+
+      // Hide all other input divs
+      endpoints.forEach(ep => {
+        if (ep.inputDiv) ep.inputDiv.classList.remove("show");
+      });
+      endpoint.inputDiv.classList.add("show");
+      if (endpoint.inputDiv.children.length === 0) {
+        generateInputFields(endpoint, endpoint.inputDiv, method, url);
       }
+    });
+  });
 
-      async function login() {
-        const data = {
-          email: document.getElementById("loginEmail").value,
-          password: document.getElementById("loginPassword").value,
-        };
+  function generateInputFields(endpoint, containerDiv, method, url) {
+    containerDiv.innerHTML = "";
 
-        const response = await fetch("/api/auth/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify(data),
-        });
-        const result = await response.json();
-        document.getElementById("response").textContent = JSON.stringify(
-          result,
-          null,
-          2,
-        );
-        if (result.accessToken) accessToken = result.accessToken;
+    const desc = document.createElement("p");
+    desc.style.fontSize = "0.85rem";
+    desc.style.color = "#6c757d";
+    desc.textContent = endpoint.description;
+    containerDiv.appendChild(desc);
+
+    if (endpoint.needsAuth) {
+      const tokenGroup = document.createElement("div");
+      tokenGroup.className = "input-group";
+      tokenGroup.innerHTML = `
+        <label>Authorization Header (Bearer token)</label>
+        <input type="text" id="token-${url}" placeholder="Access token (leave empty to use stored token)" value="${accessToken || ''}">
+        <small style="color:#6c757d;">Current stored token will be used if field empty</small>
+      `;
+      containerDiv.appendChild(tokenGroup);
+    }
+
+    // Dynamic fields with password toggle for password/newPassword
+    endpoint.fields.forEach(field => {
+      const isPasswordField = field === "password" || field === "newPassword";
+      if (isPasswordField) {
+        createPasswordInput(containerDiv, field, url);
+      } else {
+        const group = document.createElement("div");
+        group.className = "input-group";
+        let inputType = "text";
+        if (field === "email") inputType = "email";
+        group.innerHTML = `
+          <label>${field}</label>
+          <input type="${inputType}" id="${field}-${url}" placeholder="${field}">
+        `;
+        containerDiv.appendChild(group);
       }
-    </script>
-  </body>
+    });
+
+    const sendBtn = document.createElement("button");
+    sendBtn.textContent = `Send ${method} request`;
+    sendBtn.className = "send-btn";
+    sendBtn.addEventListener("click", async () => {
+      await sendRequest(endpoint, method, url);
+    });
+    containerDiv.appendChild(sendBtn);
+  }
+
+  async function sendRequest(endpoint, method, url) {
+    let bodyData = {};
+    for (let field of endpoint.fields) {
+      const inputElem = document.getElementById(`${field}-${url}`);
+      if (inputElem) bodyData[field] = inputElem.value;
+    }
+
+    const headers = { "Content-Type": "application/json" };
+    let tokenToUse = accessToken;
+    if (endpoint.needsAuth) {
+      const tokenInput = document.getElementById(`token-${url}`);
+      if (tokenInput && tokenInput.value.trim() !== "") {
+        tokenToUse = tokenInput.value.trim();
+      }
+      if (tokenToUse) {
+        headers["Authorization"] = `Bearer ${tokenToUse}`;
+      } else {
+        appendResponse({ error: "Authentication required but no token provided. Please login or provide token." });
+        return;
+      }
+    }
+
+    const fetchOptions = {
+      method: method,
+      headers: headers,
+      credentials: "include",
+    };
+
+    if (method !== "GET" && Object.keys(bodyData).length > 0) {
+      fetchOptions.body = JSON.stringify(bodyData);
+    }
+
+    appendResponse(`⏳ Sending ${method} ${url}...`);
+
+    try {
+      const response = await fetch(url, fetchOptions);
+      let data;
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json();
+      } else {
+        data = await response.text();
+      }
+      const output = {
+        status: response.status,
+        statusText: response.statusText,
+        data: data
+      };
+      appendResponse(output);
+
+      if ((url === "/api/auth/login" || url === "/api/auth/register") && data.accessToken) {
+        setAccessToken(data.accessToken);
+        appendResponse({ ...output, note: "Access token saved automatically." });
+      }
+      if (url === "/api/auth/refresh" && data.accessToken) {
+        setAccessToken(data.accessToken);
+        appendResponse({ ...output, note: "Refresh successful, new token saved." });
+      }
+      if (url === "/api/auth/logout" && response.ok) {
+        setAccessToken(null);
+      }
+    } catch (err) {
+      appendResponse({ error: err.message });
+    }
+  }
+
+  // Static register/login buttons (keep original with password toggle)
+  // Enhance existing static form fields with show/hide
+  function enhanceStaticPasswordFields() {
+    // Register password
+    const regPassInput = document.getElementById("regPassword");
+    if (regPassInput && !regPassInput.parentElement.classList.contains("password-wrapper")) {
+      const wrapper = document.createElement("div");
+      wrapper.className = "password-wrapper";
+      regPassInput.parentNode.insertBefore(wrapper, regPassInput);
+      wrapper.appendChild(regPassInput);
+      const toggle = document.createElement("button");
+      toggle.textContent = "👁️";
+      toggle.className = "toggle-password";
+      toggle.type = "button";
+      toggle.addEventListener("click", () => {
+        const isPassword = regPassInput.type === "password";
+        regPassInput.type = isPassword ? "text" : "password";
+        toggle.textContent = isPassword ? "🙈" : "👁️";
+      });
+      wrapper.appendChild(toggle);
+    }
+    // Login password
+    const loginPassInput = document.getElementById("loginPassword");
+    if (loginPassInput && !loginPassInput.parentElement.classList.contains("password-wrapper")) {
+      const wrapper = document.createElement("div");
+      wrapper.className = "password-wrapper";
+      loginPassInput.parentNode.insertBefore(wrapper, loginPassInput);
+      wrapper.appendChild(loginPassInput);
+      const toggle = document.createElement("button");
+      toggle.textContent = "👁️";
+      toggle.className = "toggle-password";
+      toggle.type = "button";
+      toggle.addEventListener("click", () => {
+        const isPassword = loginPassInput.type === "password";
+        loginPassInput.type = isPassword ? "text" : "password";
+        toggle.textContent = isPassword ? "🙈" : "👁️";
+      });
+      wrapper.appendChild(toggle);
+    }
+  }
+
+  window.register = async function() {
+    const username = document.getElementById("regUsername").value;
+    const email = document.getElementById("regEmail").value;
+    const password = document.getElementById("regPassword").value;
+    const response = await fetch("/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, email, password })
+    });
+    const result = await response.json();
+    document.getElementById("response").textContent = JSON.stringify(result, null, 2);
+    if (result.accessToken) setAccessToken(result.accessToken);
+  };
+
+  window.login = async function() {
+    const email = document.getElementById("loginEmail").value;
+    const password = document.getElementById("loginPassword").value;
+    const response = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ email, password })
+    });
+    const result = await response.json();
+    document.getElementById("response").textContent = JSON.stringify(result, null, 2);
+    if (result.accessToken) setAccessToken(result.accessToken);
+  };
+
+  // Run after DOM is loaded to enhance static fields
+  window.addEventListener("DOMContentLoaded", () => {
+    enhanceStaticPasswordFields();
+  });
+</script>
+</body>
 </html>
