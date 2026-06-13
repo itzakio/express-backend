@@ -8,6 +8,15 @@ import {
 import { authenticate, authorize } from "../middleware/auth";
 import { getUsersCollection } from "../models/userModel";
 import { ObjectId } from "mongodb";
+import {
+  otpVerificationLimiter,
+  passwordResetLimiter,
+} from "../middleware/rateLimiter";
+import {
+  requestPasswordReset,
+  resetPasswordWithToken,
+  verifyOtpAndGetResetToken,
+} from "../controllers/passwordController";
 
 const router = Router();
 
@@ -16,6 +25,9 @@ router.post("/register", register);
 router.post("/login", login);
 router.post("/refresh", refresh);
 router.post("/logout", logout);
+router.post("/forgot-password", passwordResetLimiter, requestPasswordReset);
+router.post("/verify-otp", otpVerificationLimiter, verifyOtpAndGetResetToken);
+router.post("/reset-password", otpVerificationLimiter, resetPasswordWithToken);
 
 // Protected example (any authenticated user)
 router.get("/profile", authenticate, async (req, res) => {
